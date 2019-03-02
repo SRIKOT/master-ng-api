@@ -4,18 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use App\User;
-
-use App\Http\Requests;
 use App\Http\Controllers\Controller;
 use JWTAuth;
 use Auth;
-use Validator;
-use DB;
-use Mail;
-use Hash;
-use Adldap;
-use Exception;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Adldap\Exceptions\Auth\BindException;
 //use Tymon\JWTAuth\Exceptions\TokenBlacklistedException;

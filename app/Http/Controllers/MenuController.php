@@ -11,13 +11,9 @@ use App\Http\Controllers\Shared\FunctionController;
 use Illuminate\Http\Request;
 use Auth;
 use DB;
-use File;
-use Excel;
-use Response;
 use Validator;
 use Exception;
 use App\Http\Controllers\Controller;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class MenuController extends Controller {

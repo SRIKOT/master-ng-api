@@ -32,9 +32,10 @@ Route::group(['middleware' => 'cors'], function()
 	Route::get('role/listRole','RoleController@getRole');
 	Route::get('role/getRole/{id}','RoleController@show');
 	Route::post('role/addEditRole','RoleController@addEditRole');
+	Route::delete('role/deleteRole/{id}','RoleController@destroy');
 
-	//Role
-	Route::get('customer/list','RoleController@listCustomer');
+	//Role Menu
+	Route::get('role/listRoleMenu','RoleController@getRoleMenu');
 
 	Route::get('404', ['as' => 'notfound', function () {
 		return response()->json(['status' => '404']);
