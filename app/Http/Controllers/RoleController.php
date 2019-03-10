@@ -60,25 +60,21 @@ class RoleController extends Controller
         foreach ($roles as $roleKey => $role) {
             $dataRoles[$roleKey]['role_id'] = $role->id;
             $dataRoles[$roleKey]['role_name'] = $role->role_name;
-            
-            if ($role->page_id === 'all') {
-                foreach ($menus as $cm) {
-                    $dataRoles[$roleKey]['menu'][] = true;
-                }
-            } else {
-                $pageArray = explode(',', $role->page_id);
-                $collection = collect($pageArray);
-                foreach ($menus as $k => $cm) {
-                    if ($collection->search($cm->page_id)===false) {
-                        $dataRoles[$roleKey]['menu'][] = false;
-                    } else {
-                        $dataRoles[$roleKey]['menu'][] = true;
-                    }
+            $pageArray = explode(',', $role->page_id);
+            $collection = collect($pageArray);
+            foreach ($menus as $kk => $cm) {
+                if ($collection->search($cm->page_id)===false) {
+                    $dataRoles[$roleKey]['menu'][$kk]['selected'] = false;
+                    $dataRoles[$roleKey]['menu'][$kk]['page_id'] = $cm->page_id;
+                } else {
+                    $dataRoles[$roleKey]['menu'][$kk]['selected'] = true;
+                    $dataRoles[$roleKey]['menu'][$kk]['page_id'] = $cm->page_id;
                 }
             }
+            
         }
 
-        return response()->json(['roles' => $dataRoles, 'menus' => $menus]);
+        return response()->json(['role' => $dataRoles, 'menu' => $menus]);
     }
 
     public function show($id)
@@ -149,6 +145,20 @@ class RoleController extends Controller
         } else {
             return response()->json(['status' => 500, 'data' => $errors]);
         }
+    }
+
+    public function updateRoleMenu(Request $request) {
+        $menu = [];
+        foreach($request['menu'] as $m) {
+            if($m['selected']==true) {
+                $menu[] = $m['page_id'];
+            }
+        }
+
+        $item = Role::find($request->role_id);
+        $item->page_id = empty($menu) ? '' : implode(',', $menu);
+        $item->updated_by = Auth::id();
+        $item->save();
     }
 
     public function destroy($id)

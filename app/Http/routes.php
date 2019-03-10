@@ -23,7 +23,7 @@ Route::group(['middleware' => 'cors'], function()
 	Route::post('session', 'AuthenticateController@authenticate');
 
 	//Menu
-	Route::get('menu/getMenu','MenuController@getMenu');
+	Route::get('menu/getMenu','MenuController@getMenu2');
 	Route::post('menu/cu','MenuController@CU');
 	Route::patch('menu/sortMenu','MenuController@sortMenu');
 	Route::delete('menu/del/{id}','MenuController@destroy');
@@ -36,6 +36,7 @@ Route::group(['middleware' => 'cors'], function()
 
 	//Role Menu
 	Route::get('role/listRoleMenu','RoleController@getRoleMenu');
+	Route::patch('role/updateRoleMenu','RoleController@updateRoleMenu');
 
 	Route::get('404', ['as' => 'notfound', function () {
 		return response()->json(['status' => '404']);

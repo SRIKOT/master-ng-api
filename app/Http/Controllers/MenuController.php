@@ -25,7 +25,48 @@ class MenuController extends Controller {
         $this->masterDB = env("DB_DATABASE_MASTER");
     }
 
-    public function getMenu() {
+    // public function getMenu() {
+    //     $menu_group = DB::select("
+    //         SELECT page_group_id, page_group_code, page_group_name, seq_no
+    //         FROM {$this->masterDB}.page_group
+    //         WHERE is_active = 1
+    //         ORDER BY seq_no
+    //     ");
+
+    //     $user = $this->thisEmployee->isAll();
+    //     foreach($menu_group as $mgk => $mgv) {
+    //         if($user[0]->is_all> 0) {
+    //             $menu = DB::select("
+    //                 SELECT *
+    //                 FROM {$this->masterDB}.page
+    //                 WHERE page_group_id = '{$mgv->page_group_id}'
+    //                 ORDER BY seq_no
+    //             ");
+    //             $menu_group[$mgk]->menu = $menu;
+    //         } else {
+    //             $menu = DB::select("
+    //                 SELECT p.*
+    //                 FROM {$this->masterDB}.user u
+    //                 INNER JOIN {$this->masterDB}.role r ON r.role_id = u.role_id
+    //                 INNER JOIN {$this->masterDB}.role_page rp ON rp.role_id = r.role_id
+    //                 INNER JOIN {$this->masterDB}.page p ON p.page_id = rp.page_id
+    //                 WHERE u.user_code = '".Auth::id()."'
+    //                 AND p.page_group_id = '{$mgv->page_group_id}'
+    //                 ORDER BY p.seq_no
+    //             ");
+    //             if(!empty($menu)) {
+    //                 $menu_group[$mgk]->menu = $menu;
+    //             } else {
+    //                 unset($menu_group[$mgk]);
+    //             }
+    //         }
+    //     }
+
+    //     $data_menu = collect($menu_group)->values()->all();
+    //     return response()->json(['menu_group' => $data_menu, 'is_all' => $user[0]->is_all]);
+    // }
+
+    public function getMenu2() {
         $menu_group = DB::select("
             SELECT page_group_id, page_group_code, page_group_name, seq_no
             FROM {$this->masterDB}.page_group
@@ -33,35 +74,31 @@ class MenuController extends Controller {
             ORDER BY seq_no
         ");
 
-        $user = $this->thisEmployee->isAll();
+        $userRole = DB::select("
+            SELECT r.page_id
+            FROM {$this->masterDB}.user u
+            INNER JOIN {$this->masterDB}.role r ON r.role_id = u.role_id
+            WHERE u.user_code = '".Auth::id(). " '
+        ");
+
+        $page_id = empty($userRole) ? '' : $userRole[0]->page_id;
+
         foreach($menu_group as $mgk => $mgv) {
-            if($user[0]->is_all> 0) {
-                $menu = DB::select("
-                    SELECT *
-                    FROM {$this->masterDB}.page
-                    WHERE page_group_id = '{$mgv->page_group_id}'
-                    ORDER BY seq_no
-                ");
+            $menu = DB::select("
+                SELECT *
+                FROM {$this->masterDB}.page
+                WHERE page_group_id = '$mgv->page_group_id'
+                AND FIND_IN_SET(page_id, '{$page_id}')
+            ");
+
+            if(!empty($menu)) {
                 $menu_group[$mgk]->menu = $menu;
             } else {
-                $menu = DB::select("
-                    SELECT p.*
-                    FROM {$this->masterDB}.user u
-                    INNER JOIN {$this->masterDB}.role r ON r.role_id = u.role_id
-                    INNER JOIN {$this->masterDB}.role_page rp ON rp.role_id = r.role_id
-                    INNER JOIN {$this->masterDB}.page p ON p.page_id = rp.page_id
-                    WHERE u.user_code = '".Auth::id()."'
-                    AND p.page_group_id = '{$mgv->page_group_id}'
-                    ORDER BY p.seq_no
-                ");
-                if(!empty($menu)) {
-                    $menu_group[$mgk]->menu = $menu;
-                } else {
-                    unset($menu_group[$mgk]);
-                }
+                unset($menu_group[$mgk]);
             }
         }
 
+        $user = $this->thisEmployee->isAll();
         $data_menu = collect($menu_group)->values()->all();
         return response()->json(['menu_group' => $data_menu, 'is_all' => $user[0]->is_all]);
     }
